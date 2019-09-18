@@ -64,33 +64,45 @@ function generate (players, games, shuffler) {
   return results
 }
 
-function bothInArray (collection, x, y) {
-  return collection.includes(x) && collection.includes(y)
+function groupPredicate (group, player, other) {
+  const members = flatten(group.carts)
+  return members.includes(player) && members.includes(other)
 }
 
-function toGroupStats (players, results, stripNames = false) {
-  return players.map(player => {
+function cartPredicate (group, player, other) {
+  return group.carts.some(c => c.includes(player) && c.includes(other))
+}
+
+function stats (players, results, matchingPredicate) {
+  const stats = players.map(player => {
     const others = players
       .filter(p => player !== p)
       .map(other => {
         const matches = results.map(({ groups }) =>
-          groups.map(({ carts }) =>
-            bothInArray(flatten(carts), player, other) ? 1 : 0
+          groups.map(group =>
+            matchingPredicate(group, player, other) ? 1 : 0
           )
         )
         const count = sum(flatten(matches))
-        return stripNames ? count : { [other]: count }
+        return { name: other, count }
       })
-    return stripNames ? others : { [player]: others }
+    return { name: player, counts: others }
   })
-}
 
-function toCartStats (results) {
+  // Replace arrays with playername keys:
+  const keyedStats = stats.reduce((topDict, {name: player, counts}) => {
+    topDict[player] = counts.reduce((bottomDict, {name: other, count}) => {
+      bottomDict[other] = count
+      return bottomDict
+    }, {})
+    return topDict
+  }, {})
 
+  return keyedStats
 }
 
 const results = generate(players, games, shuffle)
-
-const groupStats = toGroupStats(players, results)
-console.log(JSON.stringify(groupStats, null, 2))
-const cartStats = toCartStats(results)
+const groupStats = stats(players, results, groupPredicate)
+console.log(groupStats)
+const cartStats = stats(players, results, cartPredicate)
+console.log(cartStats)
