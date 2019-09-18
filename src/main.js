@@ -1,4 +1,5 @@
-const { sum, flatten, reject, shuffle, identity } = require('lodash')
+const { sum, flatten, values, reject, shuffle, identity } = require('lodash')
+const { min, max, std } = require('mathjs')
 
 const players = [
   'Dan',
@@ -25,12 +26,20 @@ const games = [
     desc: 'yellow ball',
     groupOccupancies: [ 3, 3, 3 ],
   },
+  {
+    desc: 'alternate shot',
+    groupOccupancies: [ 4, 5 ],
+  },
+  {
+    desc: 'wolf',
+    groupOccupancies: [ 3, 3, 3 ],
+  },
 ]
 
 function generate (players, games, shuffler) {
   // Validate the games each call for the proper number of players
   games.forEach(({desc, groupOccupancies}) => {
-    if (sum(groupOccupancies) != players.length) {
+    if (sum(groupOccupancies) !== players.length) {
       throw new Error(`Number of players in ${desc} does not match total number of players`)
     }
   })
@@ -60,7 +69,6 @@ function generate (players, games, shuffler) {
 
     return { desc, groups }
   })
-  console.log(JSON.stringify(results))
   return results
 }
 
@@ -73,7 +81,7 @@ function cartPredicate (group, player, other) {
   return group.carts.some(c => c.includes(player) && c.includes(other))
 }
 
-function stats (players, results, matchingPredicate) {
+function matchingFrequency (players, results, matchingPredicate) {
   const stats = players.map(player => {
     const others = players
       .filter(p => player !== p)
@@ -101,8 +109,37 @@ function stats (players, results, matchingPredicate) {
   return keyedStats
 }
 
-const results = generate(players, games, shuffle)
-const groupStats = stats(players, results, groupPredicate)
-console.log(groupStats)
-const cartStats = stats(players, results, cartPredicate)
-console.log(cartStats)
+function matchingStats (matchingFrequencies) {
+  const flattened = flatten(
+    values(matchingFrequencies)
+      .map(values)
+  )
+
+  return {
+    min: min(flattened),
+    max: max(flattened),
+    std: std(flattened),
+  }
+}
+
+let incumbent = 1000
+let i = 0
+while (++i) {
+  if (i % 100000 === 0) console.log(i)
+
+  const results = generate(players, games, shuffle)
+
+  const groupFrequencies = matchingFrequency(players, results, groupPredicate)
+  const groupStats = matchingStats(groupFrequencies)
+
+  const cartFrequencies = matchingFrequency(players, results, cartPredicate)
+  const cartStats = matchingStats(cartFrequencies)
+
+  if (groupStats.std + cartStats.std < incumbent) {
+    console.log(JSON.stringify(results))
+    console.log(groupStats)
+    console.log(cartStats)
+    console.log()
+    incumbent = groupStats.std + cartStats.std
+  }
+}

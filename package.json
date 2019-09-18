@@ -3,6 +3,7 @@
     "standard": "^14.3.0"
   },
   "dependencies": {
-    "lodash": "^4.17.15"
+    "lodash": "^4.17.15",
+    "mathjs": "^6.2.1"
   }
 }
