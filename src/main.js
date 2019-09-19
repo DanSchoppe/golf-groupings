@@ -38,11 +38,12 @@ const games = [
 
 function generate (players, games, shuffler) {
   // Validate the games each call for the proper number of players
-  games.forEach(({desc, groupOccupancies}) => {
-    if (sum(groupOccupancies) !== players.length) {
-      throw new Error(`Number of players in ${desc} does not match total number of players`)
-    }
-  })
+  const malformedGame = games.find(
+    ({desc, groupOccupancies}) => sum(groupOccupancies) !== players.length
+  )
+  if (malformedGame) {
+    throw new Error(`Number of players in ${malformedGame.desc} does not match total number of players`)
+  }
 
   const results = games.map(({desc, groupOccupancies}) => {
     const randomized = shuffler(players)
