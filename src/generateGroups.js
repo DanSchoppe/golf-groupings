@@ -1,6 +1,6 @@
-const { sum } = require('lodash')
+const { sum, shuffle } = require('lodash')
 
-exports.generateGroups = (players, games, shuffler) => {
+exports.generateGroups = (players, games, shuffler = shuffle) => {
   // Validate the games each call for the proper number of players
   const malformedGame = games.find(
     ({ desc, groupOccupancies }) => sum(groupOccupancies) !== players.length

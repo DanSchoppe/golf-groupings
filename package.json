@@ -1,9 +1,14 @@
 {
-  "devDependencies": {
-    "standard": "^14.3.0"
-  },
+  "license": "MIT",
   "dependencies": {
     "lodash": "^4.17.15",
     "mathjs": "^6.2.1"
+  },
+  "devDependencies": {
+    "standard": "^14.3.0"
+  },
+  "scripts": {
+    "start": "npx node src/main.js",
+    "standard": "npx standard --fix src/*"
   }
 }
