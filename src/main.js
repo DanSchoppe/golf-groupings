@@ -21,7 +21,15 @@ const players = [
 
 const games = [
   {
-    desc: 'best ball',
+    desc: 'wolf',
+    groupOccupancies: [4, 4] // Brady will miss this game
+  },
+  {
+    desc: 'alternate shot',
+    groupOccupancies: [4, 4] // Brady will miss this game
+  },
+  {
+    desc: 'yellow ball',
     groupOccupancies: [3, 3, 3]
   },
   {
@@ -29,15 +37,7 @@ const games = [
     groupOccupancies: [3, 3, 3]
   },
   {
-    desc: 'yellow ball',
-    groupOccupancies: [3, 3, 3]
-  },
-  {
-    desc: 'alternate shot',
-    groupOccupancies: [4, 5]
-  },
-  {
-    desc: 'wolf',
+    desc: 'skins',
     groupOccupancies: [3, 3, 3]
   }
 ]
